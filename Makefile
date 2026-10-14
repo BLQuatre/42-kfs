@@ -21,7 +21,8 @@ LD       = ld.lld
 TARGET   = --target=i686-elf
 
 CFLAGS   = $(TARGET) -std=gnu99 -ffreestanding -O2 -Wall -Wextra -Werror \
-           -fno-builtin -fno-stack-protector -nostdlib -nodefaultlibs \
+           -fno-builtin -fno-exceptions -fno-stack-protector -fno-rtti \
+           -nostdlib -nodefaultlibs \
            -mno-mmx -mno-sse -mno-sse2 -mno-80387 \
            -I$(INC_DIR) -MMD -MP
 ASFLAGS  = $(TARGET)
