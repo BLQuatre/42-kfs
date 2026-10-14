@@ -1,8 +1,5 @@
 NAME = kfs
 
-AS = i686-elf-as
-CC = i686-elf-gcc
-
 # Directories
 SRC_DIR = src
 INC_DIR = include
@@ -10,52 +7,61 @@ OBJ_DIR = obj
 BIN_DIR = bin
 ISO_DIR = isodir
 
-# Flags
-CFLAGS = -std=gnu99 -ffreestanding -O2 -Wall -Wextra -I$(INC_DIR) \
-		 -fno-builtin -fno-stack-protector -nostdlib -nodefaultlibs
-LDFLAGS = -T linker.ld -ffreestanding -O2 -nostdlib -nodefaultlibs
+KERNEL   = $(BIN_DIR)/$(NAME).bin
+ISO      = $(BIN_DIR)/$(NAME).iso
 
-# Source files
-C_FILES = kernel
+C_FILES  = kernel
+S_FILES  = boot
 
-S_FILES = boot
+OBJS     = $(addprefix $(OBJ_DIR)/, $(addsuffix .o, $(S_FILES) $(C_FILES)))
+DEPS     = $(OBJS:.o=.d)
 
-H_FILES = kernel
+CC       = clang
+LD       = ld.lld
+TARGET   = --target=i686-elf
 
-# SRCS = $(addprefix $(SRC_DIR)/, $(addsuffix .c, $(C_FILES))) \ // Don't think this is needed
-# 	  $(addprefix $(SRC_DIR)/, $(addsuffix .s, $(S_FILES)))
+CFLAGS   = $(TARGET) -std=gnu99 -ffreestanding -O2 -Wall -Wextra -Werror \
+           -fno-builtin -fno-stack-protector -nostdlib -nodefaultlibs \
+           -mno-mmx -mno-sse -mno-sse2 -mno-80387 \
+           -I$(INC_DIR) -MMD -MP
+ASFLAGS  = $(TARGET)
+LDFLAGS  = -m elf_i386 -T linker.ld --build-id=none
 
-HEADERS = $(addprefix $(INC_DIR)/, $(addsuffix .h, $(H_FILES)))
+all: $(NAME)
 
-OBJS = $(addprefix $(OBJ_DIR)/, $(addsuffix .o, $(C_FILES))) \
-	  $(addprefix $(OBJ_DIR)/, $(addsuffix .o, $(S_FILES)))
-
-
-all: $(BIN_DIR)/$(NAME).iso
+$(NAME): $(ISO)
 
 $(OBJ_DIR) $(BIN_DIR):
 	mkdir -p $@
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.s | $(OBJ_DIR)
-	$(AS) $< -o $@
+	$(CC) $(ASFLAGS) -c $< -o $@
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(HEADERS) | $(OBJ_DIR)
-	$(CC) -c $< -o $@ $(CFLAGS)
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BIN_DIR)/$(NAME): $(OBJS) linker.ld | $(BIN_DIR)
-	$(CC) $(LDFLAGS) -o $@ $(OBJS) -lgcc
+$(KERNEL): $(OBJS) linker.ld | $(BIN_DIR)
+	$(LD) $(LDFLAGS) -o $@ $(OBJS)
 	grub-file --is-x86-multiboot $@
 
-$(BIN_DIR)/$(NAME).iso: $(BIN_DIR)/$(NAME) grub.cfg
+$(ISO): $(KERNEL) grub.cfg
+	rm -rf $(ISO_DIR)
 	mkdir -p $(ISO_DIR)/boot/grub
-	cp $(BIN_DIR)/$(NAME) $(ISO_DIR)/boot/$(NAME)
+	cp $(KERNEL) $(ISO_DIR)/boot/$(NAME).bin
 	cp grub.cfg $(ISO_DIR)/boot/grub/grub.cfg
 	grub-mkrescue -o $@ $(ISO_DIR)
 
-run: $(BIN_DIR)/$(NAME).iso
-	qemu-system-i386 -cdrom $(BIN_DIR)/$(NAME).iso
+run: $(ISO)
+	qemu-system-i386 -cdrom $(ISO) -no-reboot -no-shutdown
 
 clean:
-	rm -rf $(OBJ_DIR) $(BIN_DIR) $(ISO_DIR)
+	rm -rf $(OBJ_DIR) $(ISO_DIR)
 
-.PHONY: all run clean
+fclean: clean
+	rm -rf $(BIN_DIR)
+
+re: fclean all
+
+-include $(DEPS)
+
+.PHONY: all $(NAME) run clean fclean re
