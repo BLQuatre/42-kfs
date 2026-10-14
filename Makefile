@@ -27,6 +27,7 @@ CFLAGS   = $(TARGET) -std=gnu99 -ffreestanding -O2 -Wall -Wextra -Werror \
            -I$(INC_DIR) -MMD -MP
 ASFLAGS  = $(TARGET)
 LDFLAGS  = -m elf_i386 -T linker.ld --build-id=none
+GRUBFLAGS = --install-modules="multiboot normal" --fonts="" --locales="" --themes=""
 
 all: $(NAME)
 
@@ -50,7 +51,7 @@ $(ISO): $(KERNEL) grub.cfg
 	mkdir -p $(ISO_DIR)/boot/grub
 	cp $(KERNEL) $(ISO_DIR)/boot/$(NAME).bin
 	cp grub.cfg $(ISO_DIR)/boot/grub/grub.cfg
-	grub-mkrescue -o $@ $(ISO_DIR)
+	grub-mkrescue $(GRUBFLAGS) -o $@ $(ISO_DIR)
 
 run: $(ISO)
 	qemu-system-i386 -cdrom $(ISO) -no-reboot -no-shutdown
