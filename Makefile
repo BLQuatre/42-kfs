@@ -8,7 +8,7 @@ BIN_DIR = bin
 ISO_DIR = isodir
 
 KERNEL   = $(BIN_DIR)/$(NAME).bin
-ISO      = $(BIN_DIR)/$(NAME).iso
+ISO      = $(NAME).iso
 
 C_FILES  = kernel lib/string drivers/vga
 S_FILES  = boot
@@ -62,7 +62,7 @@ clean:
 	rm -rf $(OBJ_DIR) $(ISO_DIR)
 
 fclean: clean
-	rm -rf $(BIN_DIR)
+	rm -rf $(BIN_DIR) $(ISO)
 
 re: fclean all
 
