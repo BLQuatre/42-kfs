@@ -17,7 +17,7 @@ OBJS     = $(addprefix $(OBJ_DIR)/, $(addsuffix .o, $(S_FILES) $(C_FILES)))
 DEPS     = $(OBJS:.o=.d)
 
 CC       = clang
-LD       = ld.lld
+LD       = ld
 TARGET   = --target=i686-elf
 
 CFLAGS   = $(TARGET) -std=gnu99 -ffreestanding -O2 -Wall -Wextra -Werror \
