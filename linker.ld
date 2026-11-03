@@ -6,26 +6,23 @@ SECTIONS
 
 	.text : ALIGN(4K)
 	{
-		*(.multiboot)
-		*(.text)
+		KEEP(*(.multiboot))
+		*(.text .text.*)
 	}
 
-	/* Read-only data. */
 	.rodata : ALIGN(4K)
 	{
-		*(.rodata)
+		*(.rodata .rodata.*)
 	}
 
-	/* Read-write data (initialized) */
 	.data : ALIGN(4K)
 	{
-		*(.data)
+		*(.data .data.*)
 	}
 
-	/* Read-write data (uninitialized) and stack */
 	.bss : ALIGN(4K)
 	{
 		*(COMMON)
-		*(.bss)
+		*(.bss .bss.*)
 	}
 }
