@@ -10,7 +10,7 @@ ISO_DIR = isodir
 KERNEL   = $(BIN_DIR)/$(NAME).bin
 ISO      = $(BIN_DIR)/$(NAME).iso
 
-C_FILES  = kernel
+C_FILES  = kernel lib/string drivers/vga
 S_FILES  = boot
 
 OBJS     = $(addprefix $(OBJ_DIR)/, $(addsuffix .o, $(S_FILES) $(C_FILES)))
@@ -22,7 +22,7 @@ TARGET   = --target=i686-elf
 
 CFLAGS   = $(TARGET) -std=gnu99 -ffreestanding -O2 -Wall -Wextra -Werror \
            -fno-builtin -fno-exceptions -fno-stack-protector -fno-rtti \
-           -nostdlib -nodefaultlibs \
+           -nostdlib -nodefaultlibs -nostdinc \
            -mno-mmx -mno-sse -mno-sse2 -mno-80387 \
            -I$(INC_DIR) -MMD -MP
 ASFLAGS  = $(TARGET)
@@ -33,13 +33,15 @@ all: $(NAME)
 
 $(NAME): $(ISO)
 
-$(OBJ_DIR) $(BIN_DIR):
+$(BIN_DIR):
 	mkdir -p $@
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.s | $(OBJ_DIR)
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.s
+	mkdir -p $(@D)
 	$(CC) $(ASFLAGS) -c $< -o $@
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(KERNEL): $(OBJS) linker.ld | $(BIN_DIR)

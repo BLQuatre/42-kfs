@@ -1,8 +1,7 @@
-#ifndef KERNEL_H
-#define KERNEL_H
+#ifndef VGA_H
+#define VGA_H
 
-#include <stddef.h>
-#include <stdint.h>
+#include "types.h"
 
 enum vga_color
 {
@@ -24,10 +23,8 @@ enum vga_color
 	VGA_COLOR_WHITE = 15,
 };
 
-size_t strlen(const char *str);
-
 void terminal_initialize(void);
-void terminal_setcolor(uint8_t color);
+void terminal_setcolor(enum vga_color fg, enum vga_color bg);
 void terminal_putchar(char c);
 void terminal_write(const char *data, size_t size);
 void terminal_writestring(const char *data);
