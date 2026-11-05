@@ -3,12 +3,12 @@ NAME = kfs
 # Directories
 SRC_DIR = src
 INC_DIR = include
-OBJ_DIR = obj
-BIN_DIR = bin
-ISO_DIR = isodir
+BUILD_DIR = build
+OBJ_DIR = $(BUILD_DIR)/obj
+ISO_DIR = $(BUILD_DIR)/isodir
 ARCH_DIR = arch/i386
 
-KERNEL   = $(BIN_DIR)/$(NAME).bin
+KERNEL   = $(BUILD_DIR)/$(NAME).bin
 ISO      = $(NAME).iso
 LINKER   = $(ARCH_DIR)/linker.ld
 GRUB_CFG = $(ARCH_DIR)/grub.cfg
@@ -36,9 +36,6 @@ all: $(NAME)
 
 $(NAME): $(ISO)
 
-$(BIN_DIR):
-	mkdir -p $@
-
 $(OBJ_DIR)/%.o: $(ARCH_DIR)/%.s
 	mkdir -p $(@D)
 	$(CC) $(ASFLAGS) -c $< -o $@
@@ -47,7 +44,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(KERNEL): $(OBJS) $(LINKER) | $(BIN_DIR)
+$(KERNEL): $(OBJS) $(LINKER)
 	$(LD) $(LDFLAGS) -o $@ $(OBJS)
 	grub-file --is-x86-multiboot $@
 
@@ -62,10 +59,10 @@ run: $(ISO)
 	qemu-system-i386 -cdrom $(ISO) -no-reboot -no-shutdown
 
 clean:
-	rm -rf $(OBJ_DIR) $(ISO_DIR)
+	rm -rf $(BUILD_DIR)
 
 fclean: clean
-	rm -rf $(BIN_DIR) $(ISO)
+	rm -f $(ISO)
 
 re: fclean all
 
