@@ -41,6 +41,16 @@ void terminal_setcolor(enum vga_color fg, enum vga_color bg)
 	terminal_color = vga_entry_color(fg, bg);
 }
 
+uint8_t terminal_getrawcolor(void)
+{
+	return terminal_color;
+}
+
+void terminal_setrawcolor(uint8_t color)
+{
+	terminal_color = color;
+}
+
 void terminal_putchar(char c)
 {
 	if (c == '\n')
@@ -62,4 +72,12 @@ void terminal_write(const char *data, size_t size)
 void terminal_writestring(const char *data)
 {
 	terminal_write(data, strlen(data));
+}
+
+void terminal_writecoloredstring(const char *data, enum vga_color fg, enum vga_color bg)
+{
+	uint8_t prev_color = terminal_getrawcolor();
+	terminal_setcolor(fg, bg);
+	terminal_writestring(data);
+	terminal_setrawcolor(prev_color);
 }
