@@ -31,7 +31,7 @@ void terminal_initialize(void)
 {
 	terminal_row = 0;
 	terminal_column = 0;
-	terminal_color = vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+	terminal_color = vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
 	for (size_t i = 0; i < VGA_WIDTH * VGA_HEIGHT; i++)
 		terminal_buffer[i] = vga_entry(' ', terminal_color);
 }
