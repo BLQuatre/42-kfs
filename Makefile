@@ -6,9 +6,12 @@ INC_DIR = include
 OBJ_DIR = obj
 BIN_DIR = bin
 ISO_DIR = isodir
+ARCH_DIR = arch/i386
 
 KERNEL   = $(BIN_DIR)/$(NAME).bin
 ISO      = $(NAME).iso
+LINKER   = $(ARCH_DIR)/linker.ld
+GRUB_CFG = $(ARCH_DIR)/grub.cfg
 
 C_FILES  = kernel lib/string drivers/vga
 S_FILES  = boot
@@ -26,7 +29,7 @@ CFLAGS   = $(TARGET) -std=gnu99 -ffreestanding -O2 -Wall -Wextra -Werror \
            -mno-mmx -mno-sse -mno-sse2 -mno-80387 \
            -I$(INC_DIR) -MMD -MP
 ASFLAGS  = $(TARGET)
-LDFLAGS  = -m elf_i386 -T linker.ld --build-id=none
+LDFLAGS  = -m elf_i386 -T $(LINKER) --build-id=none
 GRUBFLAGS = --install-modules="multiboot normal" --fonts="" --locales="" --themes=""
 
 all: $(NAME)
@@ -36,7 +39,7 @@ $(NAME): $(ISO)
 $(BIN_DIR):
 	mkdir -p $@
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.s
+$(OBJ_DIR)/%.o: $(ARCH_DIR)/%.s
 	mkdir -p $(@D)
 	$(CC) $(ASFLAGS) -c $< -o $@
 
@@ -44,15 +47,15 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(KERNEL): $(OBJS) linker.ld | $(BIN_DIR)
+$(KERNEL): $(OBJS) $(LINKER) | $(BIN_DIR)
 	$(LD) $(LDFLAGS) -o $@ $(OBJS)
 	grub-file --is-x86-multiboot $@
 
-$(ISO): $(KERNEL) grub.cfg
+$(ISO): $(KERNEL) $(GRUB_CFG)
 	rm -rf $(ISO_DIR)
 	mkdir -p $(ISO_DIR)/boot/grub
 	cp $(KERNEL) $(ISO_DIR)/boot/$(NAME).bin
-	cp grub.cfg $(ISO_DIR)/boot/grub/grub.cfg
+	cp $(GRUB_CFG) $(ISO_DIR)/boot/grub/grub.cfg
 	grub-mkrescue $(GRUBFLAGS) -o $@ $(ISO_DIR)
 
 run: $(ISO)
