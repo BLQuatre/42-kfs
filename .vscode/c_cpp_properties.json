@@ -1,0 +1,18 @@
+{
+	"configurations": [
+		{
+			"name": "kfs",
+			"compilerPath": "/usr/bin/clang",
+			"compilerArgs": [
+				"--target=i686-elf",
+				"-ffreestanding",
+				"-nostdinc",
+				"-nostdlib"
+			],
+			"includePath": ["${workspaceFolder}/include"],
+			"cStandard": "gnu99",
+			"intelliSenseMode": "linux-clang-x86"
+		}
+	],
+	"version": 4
+}
