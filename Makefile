@@ -62,7 +62,7 @@ $(ISO): $(KERNEL) $(GRUB_CFG)
 	$(TOOLPREFIX)grub-mkrescue $(GRUBFLAGS) -o $@ $(ISO_DIR)
 
 run: $(ISO)
-	qemu-system-i386 -cdrom $(ISO) -no-reboot -no-shutdown
+	qemu-system-i386 -cdrom $(ISO) -boot d -no-reboot -no-shutdown
 
 clean:
 	rm -rf $(BUILD_DIR)
