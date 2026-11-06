@@ -34,7 +34,9 @@ CFLAGS   = $(TARGET) -std=gnu99 -ffreestanding -O2 -Wall -Wextra -Werror \
            -I$(INC_DIR) -MMD -MP
 ASFLAGS  = $(TARGET)
 LDFLAGS  = -m elf_i386 -T $(LINKER) --build-id=none
-GRUBFLAGS = --install-modules="multiboot normal" --fonts="" --locales="" --themes=""
+GRUBMODS  = multiboot normal part_acorn part_amiga part_apple part_bsd part_dfly \
+            part_dvh part_gpt part_msdos part_plan part_sun part_sunpc
+GRUBFLAGS = --install-modules="$(GRUBMODS)" --fonts="" --locales="" --themes=""
 
 all: $(NAME)
 
