@@ -10,13 +10,15 @@ A minimal i386 kernel written in C and assembly, booted by GRUB through Multiboo
 
 ## Dependencies
 
-On Debian/Ubuntu:
+On Debian/Ubuntu or macOS:
 
 ```sh
 ./install_deps.sh
 ```
 
-Installs `make`, `clang`, `binutils`, `grub-common`, `grub-pc-bin`, `xorriso` and `qemu-system-x86`.
+On Debian/Ubuntu, installs `make`, `clang`, `binutils`, `grub-common`, `grub-pc-bin`, `xorriso` and `qemu-system-x86`.
+
+On macOS, requires Homebrew and the Xcode Command Line Tools (for `make` and `clang`), then installs `i686-elf-binutils`, `i686-elf-grub`, `xorriso` and `qemu`. The Makefile picks the `i686-elf-` prefixed tools automatically.
 
 ## Build
 
